@@ -550,3 +550,4 @@ $RECYCLE.BIN/
 
 artifacts/
 .idea/
+*.log
