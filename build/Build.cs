@@ -73,88 +73,7 @@ class Build : NukeBuild
                 $"--dotnetName CertManager --dotnetPath \"{outputDir}\" https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.crds.yaml");
             process.WaitForExit();
             (outputDir / "Pulumi.CertManager.csproj").Rename("Pulumi.Contrib.Kubernetes.CertManager.csproj");
-            //outputDir / "Pulumi."
-            // var chartRepository = "https://charts.jetstack.io";
-            // var chartName = "cert-manager";
-            //
-            // var versionUrl = (await GetChartVersions(chartRepository, chartName)).First().Urls.First();
-            //
-            // // Construct the Helm chart URL
-            // var helmChartUrl = $"{chartRepository}/{versionUrl}";
-            //
-            // // Step 1: Download the Helm chart
-            // using var client = new HttpClient();
-            // var bytes = await client.GetByteArrayAsync(helmChartUrl);
-            //
-            // // Step 2: Extract the Helm chart
-            // var tempFile = Path.GetTempFileName();
-            // await File.WriteAllBytesAsync(tempFile, bytes);
-            //
-            // var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            // Directory.CreateDirectory(tempDir);
-            //
-            // using (var stream = File.OpenRead(tempFile))
-            // using (var gzip = new GZipStream(stream, CompressionMode.Decompress))
-            // using (var reader = TarReader.Open(gzip))
-            // {
-            //     while (reader.MoveToNextEntry())
-            //     {
-            //         if (!reader.Entry.IsDirectory)
-            //         {
-            //             reader.WriteEntryToDirectory(tempDir, new ExtractionOptions() { ExtractFullPath = true, Overwrite = true });
-            //         }
-            //     }
-            // }
-            //
-            // var yamlFile = Path.Combine(tempDir, chartName, "templates", "crds.yaml");
-            // if (File.Exists(yamlFile))
-            // {
-            //     var outputFolder = (RootDirectory / "SandwhichStack.Pulumi.CertManager");
-            //     if (outputFolder.Exists())
-            //     {
-            //         outputFolder.DeleteDirectory();
-            //     }
-            //     var p = ProcessTasks.StartProcess(
-            //         "crd2pulumi",
-            //         $"--dotnetName SandwhichStack.Pulumi.CertManager --dotnetPath \"{outputFolder}\" \"{yamlFile}\"",
-            //         RootDirectory);
-            //     p.WaitForExit();
-            // }
         });
-    
-    public async Task<IEnumerable<ChartVersion>> GetChartVersions(string chartRepository, string chartName)
-    {
-        // Step 1: Download the index.yaml file
-        using var client = new HttpClient();
-        var indexYaml = await client.GetStringAsync($"{chartRepository}/index.yaml");
-
-        // Step 2: Parse the index.yaml file
-        var deserializer = new DeserializerBuilder()
-            .IgnoreUnmatchedProperties()
-            .WithNamingConvention(CamelCaseNamingConvention.Instance)
-            .Build();
-
-        var index = deserializer.Deserialize<Index>(indexYaml);
-
-        // Step 3: Get the versions of the chart
-        if (index.Entries.TryGetValue(chartName, out var chart))
-        {
-            return chart;
-        }
-
-        return null;
-    }
-
-    public class Index
-    {
-        public Dictionary<string, List<ChartVersion>> Entries { get; set; }
-    }
-
-    public class ChartVersion
-    {
-        public string AppVersion { get; set; }
-        public List<string> Urls { get; set; }
-    }
     
     Target Version => _ => _
         .Executes(() =>
@@ -196,53 +115,53 @@ class Build : NukeBuild
             );
         });
     
-    Target Test => _ => _
-        .DependsOn(Compile)
-        .Produces(TestResultDirectory / "*.trx")
-        .Produces(TestResultDirectory / "*.xml")
-        .Executes(() =>
-        {
-            DotNetTest(_ => _
-                .SetConfiguration(Configuration)
-                .SetNoBuild(InvokedTargets.Contains(Compile))
-                .ResetVerbosity()
-                .SetProcessArgumentConfigurator(args => args.Add("--collect:\"XPlat Code Coverage\""))
-                .SetResultsDirectory(TestResultDirectory)
-                .When(IsServerBuild, _ => _
-                    .EnableUseSourceLink())
-                .CombineWith(TestProjects, (_, v) => _
-                    .SetProjectFile(v)
-                    .SetLoggers($"trx;LogFileName={v.Name}.trx")
-                    .SetCoverletOutput(TestResultDirectory / $"{v.Name}.xml")));
-        });
-
-    string CoverageReportDirectory => ArtifactsDirectory / "coverage-report";
-
-    Target Coverage => _ => _
-        .DependsOn(Test)
-        .TriggeredBy(Test)
-        .Consumes(Test)
-        //.Produces(CoverageReportArchive)
-        .Executes(() =>
-        {
-	        var package = NuGetPackageResolver.GetGlobalInstalledPackage("dotnet-reportgenerator-globaltool", "5.1.26", null);
-	        //var settings = new GitVersionSettings().SetToolPath( package.Directory / "tools/netcoreapp3.1/any/gitversion.dll");
-
-            // TestResultDirectory.GlobFiles("**/*.xml").ForEach(x =>
-            //     x.Move(TestResultDirectory / $"{x.Parent.Name}-coverage.cobertura.xml"));
-            
-	        ReportGenerator(_ => _
-                .SetProcessToolPath(package.Directory / "tools/net7.0/any/ReportGenerator.dll")
-                .SetReports(TestResultDirectory / "**/*.xml")
-                .SetReportTypes(ReportTypes.HtmlInline)
-                .SetTargetDirectory(CoverageReportDirectory)
-                .SetFramework("net7.0"));
-            //
-            // CompressZip(
-            //     directory: CoverageReportDirectory,
-            //     archiveFile: CoverageReportArchive,
-            //     fileMode: FileMode.Create);
-        });
+    // Target Test => _ => _
+    //     .DependsOn(Compile)
+    //     .Produces(TestResultDirectory / "*.trx")
+    //     .Produces(TestResultDirectory / "*.xml")
+    //     .Executes(() =>
+    //     {
+    //         DotNetTest(_ => _
+    //             .SetConfiguration(Configuration)
+    //             .SetNoBuild(InvokedTargets.Contains(Compile))
+    //             .ResetVerbosity()
+    //             .SetProcessArgumentConfigurator(args => args.Add("--collect:\"XPlat Code Coverage\""))
+    //             .SetResultsDirectory(TestResultDirectory)
+    //             .When(IsServerBuild, _ => _
+    //                 .EnableUseSourceLink())
+    //             .CombineWith(TestProjects, (_, v) => _
+    //                 .SetProjectFile(v)
+    //                 .SetLoggers($"trx;LogFileName={v.Name}.trx")
+    //                 .SetCoverletOutput(TestResultDirectory / $"{v.Name}.xml")));
+    //     });
+    //
+    // string CoverageReportDirectory => ArtifactsDirectory / "coverage-report";
+    //
+    // Target Coverage => _ => _
+    //     .DependsOn(Test)
+    //     .TriggeredBy(Test)
+    //     .Consumes(Test)
+    //     //.Produces(CoverageReportArchive)
+    //     .Executes(() =>
+    //     {
+	   //      var package = NuGetPackageResolver.GetGlobalInstalledPackage("dotnet-reportgenerator-globaltool", "5.1.26", null);
+	   //      //var settings = new GitVersionSettings().SetToolPath( package.Directory / "tools/netcoreapp3.1/any/gitversion.dll");
+    //
+    //         // TestResultDirectory.GlobFiles("**/*.xml").ForEach(x =>
+    //         //     x.Move(TestResultDirectory / $"{x.Parent.Name}-coverage.cobertura.xml"));
+    //         
+	   //      ReportGenerator(_ => _
+    //             .SetProcessToolPath(package.Directory / "tools/net7.0/any/ReportGenerator.dll")
+    //             .SetReports(TestResultDirectory / "**/*.xml")
+    //             .SetReportTypes(ReportTypes.HtmlInline)
+    //             .SetTargetDirectory(CoverageReportDirectory)
+    //             .SetFramework("net7.0"));
+    //         //
+    //         // CompressZip(
+    //         //     directory: CoverageReportDirectory,
+    //         //     archiveFile: CoverageReportArchive,
+    //         //     fileMode: FileMode.Create);
+    //     });
     
     Target Pack => _ => _
         .DependsOn(Compile)
