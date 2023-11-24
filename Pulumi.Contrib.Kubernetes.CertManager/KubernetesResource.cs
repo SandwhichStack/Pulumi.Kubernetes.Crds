@@ -1,5 +1,5 @@
 // Copyright 2016-2022, Pulumi Corporation
-namespace Pulumi.CertManager{
+namespace Pulumi.Contrib.Kubernetes.CertManager{
     /// <summary>
     /// A base class for all Kubernetes resources.
     /// </summary>

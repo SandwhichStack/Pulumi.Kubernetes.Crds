@@ -5,7 +5,7 @@ using System;
 using System.Reflection;
 using Pulumi.Kubernetes;
 
-namespace Pulumi.CertManager
+namespace Pulumi.Contrib.Kubernetes.CertManager
 {
     static class Utilities
     {
