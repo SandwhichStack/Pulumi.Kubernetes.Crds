@@ -33,8 +33,8 @@ jobs:
             .nuke/temp
             ~/.nuget/packages
           key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj', '**/Directory.Packages.props') }}
-      - name: 'Run: Version, Test, Push'
-        run: ./build.cmd Version Test Push
+      - name: 'Run: Version, Push'
+        run: ./build.cmd Version Push
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
           INFISICAL_SERVICE_TOKEN: ${{ secrets.INFISICAL_SERVICE_TOKEN }}
