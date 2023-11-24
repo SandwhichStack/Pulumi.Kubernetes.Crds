@@ -60,7 +60,7 @@ class Build : NukeBuild
     [Parameter("API Key for the NuGet server.")]
     readonly string NugetApiKey;
 
-    Target DownloadCrds => _ => _
+    Target GenerateCode => _ => _
         .Executes(async () =>
         {
             var outputDir = RootDirectory / "Pulumi.Contrib.Kubernetes.CertManager";
