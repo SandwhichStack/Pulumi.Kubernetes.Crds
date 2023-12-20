@@ -82,7 +82,8 @@
             "enum": [
               "Clean",
               "Compile",
-              "GenerateCode",
+              "GenerateArgoCDCode",
+              "GenerateCertManagerCode",
               "Pack",
               "Push",
               "Restore",
@@ -102,7 +103,8 @@
             "enum": [
               "Clean",
               "Compile",
-              "GenerateCode",
+              "GenerateArgoCDCode",
+              "GenerateCertManagerCode",
               "Pack",
               "Push",
               "Restore",

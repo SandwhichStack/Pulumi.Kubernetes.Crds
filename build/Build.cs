@@ -60,7 +60,7 @@ class Build : NukeBuild
     [Parameter("API Key for the NuGet server.")]
     readonly string NugetApiKey;
 
-    Target GenerateCode => _ => _
+    Target GenerateCertManagerCode => _ => _
         .Executes(async () =>
         {
             var outputDir = RootDirectory / "Pulumi.Contrib.Kubernetes.CertManager";
@@ -74,7 +74,22 @@ class Build : NukeBuild
             process.WaitForExit();
             (outputDir / "Pulumi.CertManager.csproj").Rename("Pulumi.Contrib.Kubernetes.CertManager.csproj");
         });
-    
+
+    Target GenerateArgoCDCode => _ => _
+        .Executes(async () =>
+        {
+            var outputDir = RootDirectory / "Pulumi.Contrib.Kubernetes.ArgoCD";
+            if (outputDir.Exists())
+            {
+                outputDir.DeleteDirectory();
+            }
+            //outputDir.CreateDirectory();
+            var process = ProcessTasks.StartProcess("crd2pulumi",
+                $"--dotnetName ArgoCD --dotnetPath \"{outputDir}\" https://raw.githubusercontent.com/argoproj/argo-cd/v2.10.0-rc1/manifests/install.yaml");
+            process.WaitForExit();
+            (outputDir / "Pulumi.ArgoCD.csproj").Rename("Pulumi.Contrib.Kubernetes.ArgoCD.csproj");
+        });
+
     Target Version => _ => _
         .Executes(() =>
         {
