@@ -85,9 +85,24 @@ class Build : NukeBuild
             }
             //outputDir.CreateDirectory();
             var process = ProcessTasks.StartProcess("crd2pulumi",
-                $"--dotnetName ArgoCD --dotnetPath \"{outputDir}\" https://raw.githubusercontent.com/argoproj/argo-cd/v2.10.0-rc1/manifests/install.yaml");
+                $"--dotnetName ArgoCD --dotnetPath \"{outputDir}\" https://raw.githubusercontent.com/argoproj/argo-cd/v2.7.15/manifests/install.yaml");
             process.WaitForExit();
             (outputDir / "Pulumi.ArgoCD.csproj").Rename("Pulumi.Contrib.Kubernetes.ArgoCD.csproj");
+        });
+
+    Target GenerateArgoCDHaCode => _ => _
+        .Executes(async () =>
+        {
+            var outputDir = RootDirectory / "Pulumi.Contrib.Kubernetes.ArgoCD.Ha";
+            if (outputDir.Exists())
+            {
+                outputDir.DeleteDirectory();
+            }
+            //outputDir.CreateDirectory();
+            var process = ProcessTasks.StartProcess("crd2pulumi",
+                $"--dotnetName ArgoCD --dotnetPath \"{outputDir}\" https://raw.githubusercontent.com/argoproj/argo-cd/v2.7.15/manifests/ha/install.yaml");
+            process.WaitForExit();
+            (outputDir / "Pulumi.ArgoCD.csproj").Rename("Pulumi.Contrib.Kubernetes.ArgoCD.Ha.csproj");
         });
 
     Target Version => _ => _
